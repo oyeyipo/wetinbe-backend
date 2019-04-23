@@ -1,3 +1,10 @@
 from django.db import models
 
-# Create your models here.
+class Sector(models.Model):
+    pass
+
+class Provider(models.Model):
+    pass
+
+class Service(models.Model):
+    pass
