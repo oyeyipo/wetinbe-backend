@@ -25,7 +25,7 @@ SECRET_KEY = '!bbe@p$uqgnscn&#-llaxbf-5!elfu*58rn9d%-n*l*iaw8l&h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', '10.0.3.2']
 
 
 # Application definition
@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom Apps
-    'provider.apps.ProviderConfig'
+    'provider.apps.ProviderConfig',
+
+    # Libs
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -57,7 +60,7 @@ ROOT_URLCONF = 'wetinbe.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,3 +124,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+    # "/var/www/static/"
+)
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
