@@ -1,8 +1,9 @@
 from django.db import models
 import uuid as uuid_lib
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.core.validators import RegexValidator
-from ..wetinbe.models import TimeStampedModel
+from wetinbe.models import TimeStampedModel
 
 
 def upload_location(instance, filename):
@@ -61,12 +62,11 @@ class Service(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        # Post save - do something
+        # Pre save - do something
 
         # save
         super().save(*args, **kwargs)
-
-        # pre save - do something
+        # Post save - do something
         if self.has_shortcode:
             ShortCode.objects.get_or_create(service=self)
         if self.has_textcode:
@@ -89,17 +89,39 @@ class TextCode(TimeStampedModel):
     def __str__(self):
         provider = self.service.provider
         topic = self.service.title[:10]
-        result = f"code {self.textcode} for {topic} under {provider}"
+        result = f"send '{self.message}' to '{self.textcode}' >> {topic} **{provider}**"
         return result
+
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
+        # Post Save
+        if self.service.has_textcode == False:
+            self.service.has_textcode = True
+            self.service.save()
 
 
 class ShortCode(TimeStampedModel):
     service = models.OneToOneField(
         Service, on_delete=models.CASCADE, primary_key=True, related_name="shortcode")
-    shortcode = models.CharField()
+    shortcode_regex = RegexValidator(
+        regex=r'^[*#]{1,2}[0-9*#]+[#]{1}$',
+        message=(
+            'invalid shortcode: shortcode code must start with * or # and end with #. And contain no alphabets just numbers and * and #'
+        )
+    )
+    shortcode = models.CharField(max_length=30, blank=True, validators=[shortcode_regex])
 
     def __str__(self):
         provider = self.service.provider
-        topic = self.service.title[:10]
-        result = f"code {self.shortcode} for {topic} under {provider}"
+        topic = f'{self.service.title[:10]}...'
+        result = f"dial {self.shortcode} >> {topic} for '{provider}'"
         return result
+
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
+        # Post Save
+        if self.service.has_shortcode == False:
+            self.service.has_shortcode = True
+            self.service.save()

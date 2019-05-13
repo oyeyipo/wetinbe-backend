@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Provider, Service
+from .models import Provider, Service, TextCode, ShortCode
 
 
 admin.site.register(Provider)
@@ -12,3 +12,10 @@ class ServiceAdmin(admin.ModelAdmin):
 	search_fields = ['title', 'overview', 'body']
 	list_filter = ['created', 'updated']
 
+@admin.register(TextCode)
+class TextCodeAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ShortCode)
+class ShortCodeAdmin(admin.ModelAdmin):
+    pass

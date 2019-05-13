@@ -16,10 +16,39 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Provider
-from .serializers import ProviderListSerializer
+from .models import Provider, Service
+from .serializers import ProviderListSerializer, ServiceListSerializer
+
 
 class ProviderListAPIView(ListAPIView):
-	queryset = Provider.objects.all()
-	serializer_class = ProviderListSerializer
+    lookup_field = "uuid"
+    serializer_class = ProviderListSerializer
+    permision_classes = []
+
+    def get_queryset(self):
+        return Provider.objects.all()
+
+
+class ServiceListAPIView(ListAPIView):
+    serializer_class = ServiceListSerializer
+    permission_classes = []
+
+    def get_queryset(self):
+        return Service.objects.all()
+
+class ProviderServicesListAPIView(ListAPIView):
+    lookup_field = 'uuid'
+    permission_classes = []
+
+    def get_serializer_class(self):
+        return ServiceListSerializer
+
+    def get_queryset(self):
+        uuid = self.kwargs[self.lookup_field]
+        provider = get_object_or_404(Provider, uuid=uuid)
+        obj = provider.services.all()
+        return obj
+
+
+
 
